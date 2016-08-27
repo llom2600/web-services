@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title> {{ post_content.title }} </title>
+{% endblock head %}
+
+
+{% block content %}
+
+<!-- Header -->
+	<div id="header">
+		<h1> {{ post_content.title }} </h1>
+		 {% if post_content.subtitle %} 
+		<h2>
+			{{ post_content.subtitle }}
+		</h2>
+		{% endif %}
+		<h3 id="date"> {{ post_content.date | date }} </h3>
+		
+	</div>
+
+<!-- Content -->
+
+	<div id="content">
+		{{ post_content.html | safe }}
+	</div>
+{% endblock content %}

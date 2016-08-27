@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title> test title </title>
+{% endblock head %}
+
+{% block body_content %}
+
+{% for link in links %}
+<h3> {{ link.filetype }} </h3>
+<h4> {{ link.quality }} </h4>
+<a href="{{ link.url }}"> direct link  </a>
+<hr>
+{% endfor %}
+
+{% endblock body_content %}

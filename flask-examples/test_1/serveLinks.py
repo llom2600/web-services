@@ -1,6 +1,4 @@
-#youtube downloader
-# luke lombardi, 2016
-
+from flask import Flask, render_template
 from session import *
 import urllib
 import re
@@ -57,13 +55,48 @@ ITAG_FMT = {
 }
 
 
+app = Flask(__name__)
+
+@app.route('/')
+def serveLinks():
+	linkString = "a bunch of links"
+	
+	sessionParameters = {
+	'host': foreign_host,
+	'port': foreign_port
+	}
+	
+		
+	request_session = sesh(sessionParameters)	
+	status = request_session.open()
+	
+	if request_session.is_connected:
+		print "Successfully connected to: ", foreign_host
+	
+	request_session.get(linkPath)	
+	
+	if request_session.response_body != None:
+		response_body = decodeResponse(request_session.response_body)
+		directLinks = getLinks(response_body)
+	
+	linkList = []
+	if directLinks:
+		for i in range(len(directLinks)):
+			#print "------------------------------------------------------"
+			linkItem = dict(url=directLinks[i][0], filetype=directLinks[i][1][0], quality=directLinks[i][1][1])
+			linkList.append(linkItem)
+			#print "Format: ", directLinks[i][1][0], ":", directLinks[i][1][1]
+
+	
+	request_session.close()
+	return render_template("links.html", links=linkList)
+
 
 def decodeResponse(response_body):
 	chunk = re.compile(r'\r\n[0-9A-Fa-f]+\r\n', flags = re.MULTILINE)
 	m = re.findall(chunk, response_body)
 	response_body = re.sub(chunk, "", response_body)
 	return response_body
-
 
 
 def getLinks(response_body):
@@ -95,33 +128,9 @@ def getLinks(response_body):
 		return False
 	
 	return linkList
-		
-def main():
-	sessionParameters = {
-	'host': foreign_host,
-	'port': foreign_port
-	}
-	
-		
-	request_session = sesh(sessionParameters)	
-	status = request_session.open()
-	
-	if request_session.is_connected:
-		print "Successfully connected to: ", foreign_host
-	
-	request_session.get(linkPath)	
-	
-	if request_session.response_body != None:
-		response_body = decodeResponse(request_session.response_body)
-		directLinks = getLinks(response_body)
-	
-	if directLinks:
-		for i in range(len(directLinks)):
-			print "------------------------------------------------------"
-			print directLinks[i][0]
-			print "Format: ", directLinks[i][1][0], ":", directLinks[i][1][1]
 
-			
-	request_session.close()
+
+if __name__ == "__main__":
+	app.run(port=8000, debug=False)
 	
-if __name__ == "__main__":main()
+	
